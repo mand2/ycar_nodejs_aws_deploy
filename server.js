@@ -8,7 +8,6 @@ const socket = require('socket.io');
 const io = socket(server);
  
 const port = 5000;
-let nameIdx = [];
 let nickname = new Map();
 let room = new Map();
 let socketList = [];
@@ -35,17 +34,9 @@ io.on('connection', (socket) => {
  
     socket.on('SEND', (msgData) => {
         console.log(msgData);
-        
-        //나를 제외한 모든 사람에게 보내기.
-        socketList.forEach((item, i) => {
-            // console.log('id',item.id);
-            if(item != socket){
-                // item.emit('SEND', msg);
 
-                // msgData: room, nickname, parsedate, msg
-                item.emit('SEND', msgData.nickname, msgData.msg, new Date().toString());
-            }
-        });
+        //나를 제외한 모든 사람에게 보내기. + 같은room에
+        io.to(room.get(socket.id)).emit('SEND', msgData.nickname, msgData.msg, new Date().toString());
     });
 
     socket.on('disconnect', () =>{
